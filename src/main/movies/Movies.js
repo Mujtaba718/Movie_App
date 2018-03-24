@@ -2,8 +2,6 @@ import React from "react";
 import "./Movies.css";
 import MovieListItem from "./MovieListItem";
 
-const movies = ["Breaking bad", "Narcos", "Game of Thrones"];
-
 class Movies extends React.Component {
   state = {
     movies: []
@@ -18,6 +16,7 @@ class Movies extends React.Component {
   }
 
   storeMovies = data => {
+  	// data.results is the array with 20 objects
     const movies = data.results.map(result => {
       const {
         vote_count,
