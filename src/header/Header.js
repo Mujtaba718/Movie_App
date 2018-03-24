@@ -3,7 +3,7 @@ import "./Header.css";
 
 const Header = () => (
   <header>
-    <h1>Sweet Pumpkins</h1>
+    <h1><i className="fas fa-film"></i>Film Finder</h1>
   </header>
 )
 

@@ -1,19 +1,19 @@
 import React from "react";
 import "./Navigation.css";
 import Selection from "./Selection";
-import Slider from './Slider.js';
+import Slider from './Slider';
+import Button from './Button'
 
 class Navigation extends React.Component {
-
   componentDidMount() {
-	  fetch(this.props.url)
-	    .then(response => response.json())
-	    .then(data => this.props.setGenres( data.genres ))
-	    .catch(error => console.log(error));
+    fetch(this.props.url)
+      .then(response => response.json())
+      .then(data => this.props.setGenres(data.genres))
+      .catch(error => console.log(error));
   }
 
   render() {
-    const { genre, genres, onGenreChange, onChange, year, rating, runtime } = this.props; //Came from spread operator from Main
+    const { genre, genres, onGenreChange, onChange, year, rating, runtime, onSearchButtonClick } = this.props;
     return (
       <section className="navigation">
         <Selection
@@ -24,11 +24,15 @@ class Navigation extends React.Component {
 
         <Slider data={year} onChange={onChange} />
         <Slider data={rating} onChange={onChange} />
-        <Slider data={runtime} onChange={onChange} />
+        <Slider data={runtime} onChange={onChange} /> 
+
+        <Button onClick={onSearchButtonClick}>
+        	Search
+        </Button>
+
       </section>
     )
   }
-  
 }
 
 export default Navigation;

@@ -5,11 +5,15 @@ import Movies from "./movies/Movies";
 
 class Main extends React.Component {
   state = {
-    genre: "comedy",
+  	movies: [],
+  	page: 1,
+  	url: `https://api.themoviedb.org/3/genre/movie/list?api_key=651925d45022d1ae658063b443c99784&language=en-US`,
+  	moviesUrl: `https://api.themoviedb.org/3/discover/movie?api_key=651925d45022d1ae658063b443c99784&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1`,
+    genre: "Comedy",
     genres: [],
     year: {
       label: "year",
-      min: 1990,
+      min: 1965,
       max: 2017,
       step: 1,
       value: { min: 2000, max: 2017 }
@@ -35,7 +39,7 @@ class Main extends React.Component {
   }
 
    setGenres = genres => {
-	 this.setState({genres});
+	this.setState({ genres });
    }
 
   onChange = data => {
@@ -47,16 +51,84 @@ class Main extends React.Component {
     });
   };
 
+  generateUrl = () => {
+    const {genres, year, rating, runtime, page } = this.state;
+    // The find() method returns the value of the first element 
+    // in the array that satisfies the provided testing function
+    const selectedGenre = genres.find( genre => genre.name === this.state.genre);
+    const genreId = selectedGenre.id;
+
+    const moviesUrl = `https://api.themoviedb.org/3/discover/movie?` +
+      `api_key=${process.env.REACT_APP_TMDB_API_KEY}&` +
+      `language=en-US&sort_by=popularity.desc&` +
+      `with_genres=${genreId}&` +
+      `primary_release_date.gte=${year.value.min}-01-01&` +
+      `primary_release_date.lte=${year.value.max}-12-31&` +
+      `vote_average.gte=${rating.value.min}&` +
+      `vote_average.lte=${rating.value.max}&` +
+      `with_runtime.gte=${runtime.value.min}&` +
+      `with_runtime.lte=${runtime.value.max}&` +
+      `page=${page}`;
+
+    this.setState({ moviesUrl });
+  }
+
+  onSearchButtonClick = () => {
+    this.generateUrl();
+  }
+
+  fetchMovies = (url) => {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => this.storeMovies(data))
+      .catch(error => console.log(error));
+  }
+
+  storeMovies = data => {
+	 const movies = data.results.map(result => {
+	   const {
+	     vote_count,
+	     id,
+	     genre_ids,
+	     poster_path,
+	     title,
+	     vote_average,
+	     release_date
+	   } = result;
+	   return { vote_count, id, genre_ids, poster_path, title, vote_average, release_date };
+	 });
+	 this.setState({ movies, total_pages: data.total_pages });
+  };
+
+  componentDidMount() {
+  	this.fetchMovies(this.state.moviesUrl);
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (this.state.moviesUrl !== nextState.moviesUrl) {
+      this.fetchMovies(nextState.moviesUrl);
+    }
+    if (this.state.page !== nextState.page) {
+      this.generateUrl();
+    }
+  }
+
   render() {
     return (
       <main>
         <Navigation
-		  onChange={this.onChange}
-		  onGenreChange={this.onGenreChange}
-		  setGenres={this.setGenres}
-		  {...this.state} //ES6 spread operator. All properties of this.state will be accessible to  in the Navigation component via props.
+		    onChange={this.onChange}
+		    onGenreChange={this.onGenreChange}
+		    setGenres={this.setGenres}
+		    onSearchButtonClick={this.onSearchButtonClick}
+		    {...this.state} //ES6 spread operator. All properties of this.state will be accessible to  in the Navigation component via props.
 		/>
-        <Movies />
+        <Movies 
+	    	movies={this.state.movies}
+	    	page={this.state.page}
+	    	onPageIncrease={this.onPageIncrease}
+	      	onPageDecrease={this.onPageDecrease}
+         />
       </main>
     )
   }

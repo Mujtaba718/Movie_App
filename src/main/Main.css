@@ -1,26 +1,4 @@
-/* Main.css*/
-
 main {
 	display: flex;
 }
 
-.navigation, .movies {
-	height: 200px;
-}
-
-/* Navigation.css*/
-
-.navigation {
-	flex-basis: 20%;
-	min-width: 300px;
-}
-
-/* Movies.css*/
-
-.movies {
-  flex-basis: 80%;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 20px 0;
-  margin: 0;
-}
